@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="引言gitlab基于相同的核心，有两个版本：社区版(Gitlab-CE, Community Edition)和企业版(Gitlab-EE, Enterprise Edition) 社区版是开放源码的，公开源码在这里，拥有MIT许可证；企业版是在社区版的基础上增加了其它的功能和特性，在专有许可证下使用，代码在这里。 两种版本都需要gitlab-shell和gitaly两种必须的附加组件。这两种组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gitlab architecture">
+<meta property="og:url" content="http://nqiu.github.io/2020/01/02/gitlab-architecture/index.html">
+<meta property="og:site_name" content="NQiu&#39;s Blog">
+<meta property="og:description" content="引言gitlab基于相同的核心，有两个版本：社区版(Gitlab-CE, Community Edition)和企业版(Gitlab-EE, Enterprise Edition) 社区版是开放源码的，公开源码在这里，拥有MIT许可证；企业版是在社区版的基础上增加了其它的功能和特性，在专有许可证下使用，代码在这里。 两种版本都需要gitlab-shell和gitaly两种必须的附加组件。这两种组件">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://nqiu.github.io/images/gitlab_architecture_simplified.png">
+<meta property="og:updated_time" content="2020-01-02T14:51:38.407Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="gitlab architecture">
+<meta name="twitter:description" content="引言gitlab基于相同的核心，有两个版本：社区版(Gitlab-CE, Community Edition)和企业版(Gitlab-EE, Enterprise Edition) 社区版是开放源码的，公开源码在这里，拥有MIT许可证；企业版是在社区版的基础上增加了其它的功能和特性，在专有许可证下使用，代码在这里。 两种版本都需要gitlab-shell和gitaly两种必须的附加组件。这两种组件">
+<meta name="twitter:image" content="http://nqiu.github.io/images/gitlab_architecture_simplified.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>gitlab architecture</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/01/04/get-to-know-git/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2019/12/31/gitlab-ce-installation/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/02/gitlab-architecture/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&text=gitlab architecture"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&is_video=false&description=gitlab architecture"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=gitlab architecture&body=Check out this article: http://nqiu.github.io/2020/01/02/gitlab-architecture/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&name=gitlab architecture&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引言"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#架构"><span class="toc-number">2.</span> <span class="toc-text">架构</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#注1：-GIT-HOME为git用户的家目录，即GIT-HOME-git。也可通过cd-git-amp-amp-pwd"><span class="toc-number">2.0.0.0.1.</span> <span class="toc-text">注1：$GIT_HOME为git用户的家目录，即GIT_HOME=~git。也可通过cd ~git &amp;&amp; pwd</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信"><span class="toc-number">2.0.0.0.2.</span> <span class="toc-text">注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#布局与运维"><span class="toc-number">3.</span> <span class="toc-text">布局与运维</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        gitlab architecture
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">NQiu's Blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-02T08:30:49.000Z" itemprop="datePublished">2020-01-02</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>gitlab基于相同的核心，有两个版本：社区版(Gitlab-CE, Community Edition)和企业版(Gitlab-EE, Enterprise Edition)</p>
+<p>社区版是开放源码的，公开源码在<a href https: gitlab.com gitlab-org gitlab-foss "" title="gitlab-foss">这里</a>，拥有MIT许可证；企业版是在社区版的基础上增加了其它的功能和特性，在专有许可证下使用，代码在<a href https: gitlab.com gitlab-org gitlab "" title="gitlab">这里</a>。</p>
+<p>两种版本都需要gitlab-shell和gitaly两种必须的附加组件。这两种组件分别在<a href https: gitlab.com gitlab-org gitlab-shell"">Gitlab-Shell</a>和<a href https: gitlab.com gitlab-org gitaly"">gitaly</a>代码库。</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>先通过一张简化的构架图来理解Gitlab的架构及工作原理。</p>
+<p><img src="/images/gitlab_architecture_simplified.png" alt="Gitlab简化架构图"></p>
+<p>先介绍一下各组件：</p>
+<ul>
+<li>Nginx: Web入口，也可使用Apache，HTTP/HTTPS方式访问仓库</li>
+<li>Gitlab-Shell: 相对HTTP方式，使用ssh访问仓库</li>
+<li>PostgreSQL: 持久化数据库，也可使用MySQL，存储用户、权限、issue、MR等信息</li>
+<li>Sidekiq: 消费redis中的任务，如发送电子邮件、通知等</li>
+<li>Redis: 非持久化存储，用作缓存、任务队列等</li>
+<li>Unicorn: gitlab的web服务器，提供gitlab api等，处理快速的/一般的任务，与redis配合，主要包括：<ul>
+<li>检查Redis中的会话进行认证、鉴权</li>
+<li>生成Sidekiq任务并发送到Redis</li>
+<li>提供项目、仓库等信息</li>
+</ul>
+</li>
+<li>Gitaly: 以RPC方式提供仓库服务，专门负责访问磁盘以高效处理git操作，并缓存耗时任务。几乎所有仓库服务最终都需要gitaly。</li>
+<li>Gitlab-Workhorse: 反向代理，缓解Unicorn压力，处理于Rails无关的操作，管理websocket长链接，处理”Large”HTTP请求，如文件上传/下载，Git push/pull及archive下载等。</li>
+</ul>
+<p>从架构图上可知，Gitlab通过web和ssh两种方式提供仓库服务。下面简要介绍一下两种方式。</p>
+<ul>
+<li><p>web方式</p>
+<ul>
+<li>Nginx或Apache作为入口，接收用户请求，passproxy到gitlab-workhorse，gitlab-workhorse访问unicorn提供的gitlab api进行鉴权。对于静态资源如<code>$GIT_HOME/gitlab/public</code>下的静态页、头像、附件及其它预编译的静态资源可跳过Unicorn，由Nginx或gitlab-workhorse直接访问磁盘。</li>
+<li>可以认为所有web请求都由gitlab-workhorse接管，有些请求要交给Unicorn处理，有些gitlab-workhorse直接处理了（可能需要gitlab-workhorse先通过Unicorn鉴权后处理）。</li>
+<li>Gitlab的web服务是ruby rails框架实现的，Unicorn作用Web服务器，使用PostgreSQL作为持久化数据库，使用Sidekiq处理异步任务，Redis作为缓存和任务队列。</li>
+</ul>
+</li>
+<li><p>ssh方式<br>Gitlab-Shell组件使得gitlab可以通过ssh提供仓库服务。它使用<code>$GIT_HOME/.ssh/authorized_keys</code>存储和管理ssh keys，该文件不应手动修改。Gitlab-shell通过gitaly提供的rpc操作/访问仓库，并可能提交任务到redis以供Sidekiq处理</p>
+</li>
+</ul>
+<h6 id="注1：-GIT-HOME为git用户的家目录，即GIT-HOME-git。也可通过cd-git-amp-amp-pwd"><a href="#注1：-GIT-HOME为git用户的家目录，即GIT-HOME-git。也可通过cd-git-amp-amp-pwd" class="headerlink" title="注1：$GIT_HOME为git用户的家目录，即GIT_HOME=~git。也可通过cd ~git &amp;&amp; pwd"></a>注1：$GIT_HOME为git用户的家目录，即<code>GIT_HOME=~git</code>。也可通过<code>cd ~git &amp;&amp; pwd</code></h6><h6 id="注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信"><a href="#注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信" class="headerlink" title="注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信"></a>注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信</h6><p>最后附一张Gitlab全组件的详细架构图，以供参考。</p>
+<p><em>todo</em></p>
+<h2 id="布局与运维"><a href="#布局与运维" class="headerlink" title="布局与运维"></a>布局与运维</h2><p>采用Omnibus Package方式安装的gitalb默认安装在git的家目录，</p>
+<ul>
+<li><p>/var/opt/gitlab, git家目录，可通过如下命令查看</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ cat /etc/passwd | grep ^git</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>目录结构如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">$ tree -a -L 1 /var/opt/gitlab</span><br><span class="line">/var/opt/gitlab</span><br><span class="line">├── alertmanager/</span><br><span class="line">├── backups/</span><br><span class="line">├── bootstrapped</span><br><span class="line">├── gitaly/</span><br><span class="line">├── git-data/</span><br><span class="line">├── gitlab-ci</span><br><span class="line">│   └── builds/</span><br><span class="line">├── gitlab-exporter</span><br><span class="line">│   ├── gitlab-exporter.yml</span><br><span class="line">│   └── RUBY_VERSION</span><br><span class="line">├── gitlab-rails</span><br><span class="line">│   ├── etc/</span><br><span class="line">│   ├── REVISION</span><br><span class="line">│   ├── RUBY_VERSION</span><br><span class="line">│   ├── shared/</span><br><span class="line">│   ├── sockets/</span><br><span class="line">│   ├── tmp/</span><br><span class="line">│   ├── upgrade-status/</span><br><span class="line">│   ├── uploads/</span><br><span class="line">│   ├── VERSION</span><br><span class="line">│   └── working/</span><br><span class="line">├── gitlab-shell/</span><br><span class="line">├── gitlab-workhorse/</span><br><span class="line">├── grafana/</span><br><span class="line">├── logrotate/</span><br><span class="line">├── nginx/</span><br><span class="line">├── node-exporter</span><br><span class="line">│   └── textfile_collector</span><br><span class="line">├── postgres-exporter/</span><br><span class="line">├── postgresql</span><br><span class="line">│   └── data/</span><br><span class="line">├── prometheus/</span><br><span class="line">├── public_attributes.json</span><br><span class="line">├── redis/</span><br><span class="line">├── .ssh/</span><br><span class="line">└── trusted-certs-directory-hash</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Gitlab在/var/opt/gitlab/bin下了rake任务，用于数据备份、查看版本、检查配置文件等</li>
+<li>各模块都有一个独立目录，其中包含了配置文件或日志文件</li>
+<li>Git仓库存储在git-data目录</li>
+</ul>
+</li>
+<li><p>Gitlab日志位置/var/opt/gitlab/log/目录，其他模块在各自的子目录或有独立的日志，如</p>
+<ul>
+<li>redis可能在/var/log/redis/</li>
+<li>nginx可能在/var/log/nginx/</li>
+</ul>
+</li>
+<li><p>gitlab相关进程可通过如下命令查看</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ps aux | grep ^git</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>gitlab提供了gitlab-ctl命令管理gitlab服务，如查看相关服务运行状态</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo gitlab-ctl status</span><br></pre></td></tr></table></figure>
+
+<p><code>gitlab-ctl</code>详细使用见参考[1]</p>
+</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href https: docs.gitlab.com ee development architecture.html#gitlab-workhorse"" title="gitlab architecture">GitLab官方文档</a></li>
+<li><a href https: gitlab.com gitlab-org"" title="gitlab.org">gitlab官方代码库</a></li>
+<li><a href https: docs.gitlab.com omnibus maintenance "" title="gitlab-ctl">gitlab-ctl手册</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引言"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#架构"><span class="toc-number">2.</span> <span class="toc-text">架构</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#注1：-GIT-HOME为git用户的家目录，即GIT-HOME-git。也可通过cd-git-amp-amp-pwd"><span class="toc-number">2.0.0.0.1.</span> <span class="toc-text">注1：$GIT_HOME为git用户的家目录，即GIT_HOME=~git。也可通过cd ~git &amp;&amp; pwd</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信"><span class="toc-number">2.0.0.0.2.</span> <span class="toc-text">注2：上图中的连线（进程间通信），除特别标明是TCP方式通信，默认使用socket通信</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#布局与运维"><span class="toc-number">3.</span> <span class="toc-text">布局与运维</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/02/gitlab-architecture/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&text=gitlab architecture"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&is_video=false&description=gitlab architecture"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=gitlab architecture&body=Check out this article: http://nqiu.github.io/2020/01/02/gitlab-architecture/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&title=gitlab architecture"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/02/gitlab-architecture/&name=gitlab architecture&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    <a href="http://beian.miit.gov.cn">京ICP备19057023号-1</a>
+    Copyright &copy; 2020 Nicholas Qiu
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+<!-- clipboard -->
+
+  <script src="/lib/clipboard/clipboard.min.js"></script>
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight .code pre").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      target: function(trigger) {
+        return trigger.nextElementSibling;
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
