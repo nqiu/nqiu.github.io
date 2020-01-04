@@ -13,12 +13,12 @@
 <meta property="og:site_name" content="NQiu&#39;s Blog">
 <meta property="og:description" content="什么是gitgit是一款免费、开源的分布式版本控制系统(Distributed Version Control System，简称DVCS)。相对于集中式版本控制系统(Centralized Version Control System，简称CVCS，如CVS, Subversion)，像 Git、Mercurial 等这类DVCS系统，客户端并不只提取最新版本的文件快照，而是把代码仓库完整地镜像">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://nqiu.github.io/.io//git-areas.png">
-<meta property="og:updated_time" content="2020-01-04T14:52:43.750Z">
+<meta property="og:image" content="http://nqiu.github.io/images/git-areas.png">
+<meta property="og:updated_time" content="2020-01-04T15:50:09.279Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="get to know git">
 <meta name="twitter:description" content="什么是gitgit是一款免费、开源的分布式版本控制系统(Distributed Version Control System，简称DVCS)。相对于集中式版本控制系统(Centralized Version Control System，简称CVCS，如CVS, Subversion)，像 Git、Mercurial 等这类DVCS系统，客户端并不只提取最新版本的文件快照，而是把代码仓库完整地镜像">
-<meta name="twitter:image" content="http://nqiu.github.io/.io//git-areas.png">
+<meta name="twitter:image" content="http://nqiu.github.io/images/git-areas.png">
     
     
         
@@ -160,7 +160,7 @@
 <p>Git 中使用这种哈希值的情况很多，你将经常看到这种哈希值。 实际上，Git 数据库中保存的信息都是以文件内容的哈希值来索引，而不是文件名。</p>
 <h2 id="三种状态"><a href="#三种状态" class="headerlink" title="三种状态"></a>三种状态</h2><p> Git 有三种状态，你的文件可能处于其中之一：已提交（committed）、已修改（modified）和已暂存（staged）。 已提交表示数据已经安全的保存在本地数据库中。 已修改表示修改了文件，但还没保存到数据库中。 已暂存表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。</p>
 <p>由此引入 Git 项目的三个工作区域的概念：Git 仓库、工作目录以及暂存区域。</p>
-<p><img src="/.io//git-areas.png" alt="工作目录、暂存区域以及Git仓库"></p>
+<p><img src="/images/git-areas.png" alt="工作目录、暂存区域以及Git仓库"></p>
 <p>Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。 这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。</p>
 <p>工作目录是对项目的某个版本独立提取出来的内容。 这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。</p>
 <p>暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。 有时候也被称作“索引”，不过一般说法还是叫暂存区域。</p>
