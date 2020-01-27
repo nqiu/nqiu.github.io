@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Git 能在特定的重要动作发生时触发自定义脚本，即钩子。 有两组这样的钩子：客户端的和服务器端的。 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。 你可以随心所欲地运用这些钩子。 钩子都被存储在 Git 目录下的 hooks 子目录中。 也即绝大部分项目中的 .git/hooks 。把一个正确命名且可执行的文件放入 Git 目录下的 hooks">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git钩子">
+<meta property="og:url" content="http://nqiu.github.io/2020/01/05/git-hooks/index.html">
+<meta property="og:site_name" content="NQiu&#39;s Blog">
+<meta property="og:description" content="Git 能在特定的重要动作发生时触发自定义脚本，即钩子。 有两组这样的钩子：客户端的和服务器端的。 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。 你可以随心所欲地运用这些钩子。 钩子都被存储在 Git 目录下的 hooks 子目录中。 也即绝大部分项目中的 .git/hooks 。把一个正确命名且可执行的文件放入 Git 目录下的 hooks">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-01-27T07:41:04.533Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git钩子">
+<meta name="twitter:description" content="Git 能在特定的重要动作发生时触发自定义脚本，即钩子。 有两组这样的钩子：客户端的和服务器端的。 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。 你可以随心所欲地运用这些钩子。 钩子都被存储在 Git 目录下的 hooks 子目录中。 也即绝大部分项目中的 .git/hooks 。把一个正确命名且可执行的文件放入 Git 目录下的 hooks">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>git钩子</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/01/05/git-server/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2020/01/05/git-branch/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/05/git-hooks/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/05/git-hooks/&text=git钩子"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/05/git-hooks/&is_video=false&description=git钩子"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=git钩子&body=Check out this article: http://nqiu.github.io/2020/01/05/git-hooks/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/05/git-hooks/&name=git钩子&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#客户端钩子"><span class="toc-number">1.</span> <span class="toc-text">客户端钩子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#服务器端钩子"><span class="toc-number">2.</span> <span class="toc-text">服务器端钩子</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pre-receive"><span class="toc-number">2.1.</span> <span class="toc-text">pre-receive</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#update"><span class="toc-number">2.2.</span> <span class="toc-text">update</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#post-receive"><span class="toc-number">2.3.</span> <span class="toc-text">post-receive</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        git钩子
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">NQiu's Blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-05T06:03:51.000Z" itemprop="datePublished">2020-01-05</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Git 能在特定的重要动作发生时触发自定义脚本，即钩子。 有两组这样的钩子：客户端的和服务器端的。 客户端钩子由诸如提交和合并这样的操作所调用，而服务器端钩子作用于诸如接收被推送的提交这样的联网操作。 你可以随心所欲地运用这些钩子。</p>
+<p>钩子都被存储在 Git 目录下的 <code>hooks</code> 子目录中。 也即绝大部分项目中的 <code>.git/hooks</code> 。把一个正确命名且可执行的文件放入 Git 目录下的 <code>hooks</code> 子目录中，即可激活该钩子脚本。 这样一来，它就能被 Git 调用。</p>
+<h3 id="客户端钩子"><a href="#客户端钩子" class="headerlink" title="客户端钩子"></a>客户端钩子</h3><p>客户端钩子分为很多种。 下面把它们分为：提交工作流钩子、电子邮件工作流钩子和其它钩子。需要注意的是，克隆某个版本库时，它的客户端钩子 <strong>并不</strong> 随同复制。 如果需要靠这些脚本来强制维持某种策略，建议在服务器端实现这一功能。</p>
+<p><strong>提交工作流钩子</strong></p>
+<p><code>pre-commit</code> 钩子在键入提交信息前运行。 它用于检查即将提交的快照，例如，检查是否有所遗漏，确保测试运行，以及核查代码。 如果该钩子以非零值退出，Git 将放弃此次提交，不过你可以用 <code>git commit --no-verify</code> 来绕过这个环节。 你可以利用该钩子，来检查代码风格是否一致（运行类似 <code>lint</code> 的程序）、尾随空白字符是否存在（自带的钩子就是这么做的），或新方法的文档是否适当。</p>
+<p><code>prepare-commit-msg</code> 钩子在启动提交信息编辑器之前，默认信息被创建之后运行。 它允许你编辑提交者所看到的默认信息。 该钩子接收一些选项：存有当前提交信息的文件的路径、提交类型和修补提交的提交的 SHA-1 校验。 它对一般的提交来说并没有什么用；然而对那些会自动产生默认信息的提交，如提交信息模板、合并提交、压缩提交和修订提交等非常实用。 你可以结合提交模板来使用它，动态地插入信息。</p>
+<p><code>commit-msg</code> 钩子接收一个参数，此参数即上文提到的，存有当前提交信息的临时文件的路径。 如果该钩子脚本以非零值退出，Git 将放弃提交，因此，可以用来在提交通过前验证项目状态或提交信息，如使用该钩子来核对提交信息是否遵循指定的模板。</p>
+<p><code>post-commit</code> 钩子在整个提交过程完成后运行。 它不接收任何参数，但你可以很容易地通过运行 <code>git log -1 HEAD</code> 来获得最后一次的提交信息。 该钩子一般用于通知之类的事情。</p>
+<p><strong>电子邮件工作流钩子</strong></p>
+<p>电子邮件工作流设置三个客户端钩子。 它们都是由 git am 命令调用的，如果你需要通过电子邮件接收由 git format-patch 产生的补丁，这些钩子也许用得上。</p>
+<p>第一个运行的钩子是 applypatch-msg 。 它接收单个参数：包含请求合并信息的临时文件的名字。 如果脚本返回非零值，Git 将放弃该补丁。 你可以用该脚本来确保提交信息符合格式，或直接用脚本修正格式错误。</p>
+<p>下一个在 git am 运行期间被调用的是 pre-applypatch 。 它正好运行于应用补丁 之后，产生提交之前，所以你可以用它在提交前检查快照。 可以用这个脚本运行测试或检查工作区。 如果有什么遗漏，或测试未能通过，脚本会以非零值退出，中断 git am 的运行，这样补丁就不会被提交。</p>
+<p>post-applypatch 运行于提交产生之后，是在 git am 运行期间最后被调用的钩子。 可以用它把结果通知给一个小组或所拉取的补丁的作者。 但没办法用它停止打补丁的过程。</p>
+<p><strong>其它客户端钩子</strong></p>
+<p><code>pre-rebase</code> 钩子运行于变基之前，以非零值退出可以中止变基的过程。 你可以使用这个钩子来禁止对已经推送的提交变基。</p>
+<p><code>post-rewrite</code> 钩子被那些会替换提交记录的命令调用，比如 <code>git commit --amend</code> 和 <code>git rebase</code>（不过不包括 <code>git filter-branch</code>）。 它唯一的参数是触发重写的命令名，同时从标准输入中接受一系列重写的提交记录。 这个钩子的用途很大程度上跟 <code>post-checkout</code> 和 <code>post-merge</code> 差不多。</p>
+<p>在 <code>git checkout</code> 成功运行后，<code>post-checkout</code> 钩子会被调用。可以根据你的项目环境用它调整你的工作目录。 其中包括放入大的二进制文件、自动生成文档或进行其他类似这样的操作。</p>
+<p>在 <code>git merge</code> 成功运行后，<code>post-merge</code> 钩子会被调用。 可以用它恢复 Git 无法跟踪的工作区数据，比如权限数据。 这个钩子也可以用来验证某些在 Git 控制之外的文件是否存在，这样就能在工作区改变时，把这些文件复制进来。</p>
+<p><code>pre-push</code> 钩子会在 <code>git push</code> 运行期间， 更新了远程引用但尚未传送对象时被调用。 它接受远程分支的名字和位置作为参数，同时从标准输入中读取一系列待更新的引用。 你可以在推送开始之前，用它验证对引用的更新操作（一个非零的退出码将终止推送过程）。</p>
+<p>Git 的一些日常操作在运行时，偶尔会调用 <code>git gc --auto</code> 进行垃圾回收。 <code>pre-auto-gc</code> 钩子会在垃圾回收开始之前被调用，可以用它来提醒你现在要回收垃圾了，或者依情形判断是否要中断回收。</p>
+<h3 id="服务器端钩子"><a href="#服务器端钩子" class="headerlink" title="服务器端钩子"></a>服务器端钩子</h3><p>除了客户端钩子，作为系统管理员，你还可以使用若干服务器端的钩子对项目强制执行各种类型的策略。 这些钩子脚本在推送到服务器之前和之后运行。 推送到服务器前运行的钩子可以在任何时候以非零值退出，拒绝推送并给客户端返回错误消息，还可以依你所想设置足够复杂的推送策略。</p>
+<h4 id="pre-receive"><a href="#pre-receive" class="headerlink" title="pre-receive"></a><code>pre-receive</code></h4><p>处理来自客户端的推送操作时，最先被调用的脚本是 <code>pre-receive</code>。 它从标准输入获取一系列被推送的引用。如果它以非零值退出，所有的推送内容都不会被接受。 可以用这个钩子阻止对引用进行非快进（non-fast-forward）的更新，或者对该推送所修改的所有引用和文件进行访问控制。</p>
+<h4 id="update"><a href="#update" class="headerlink" title="update"></a><code>update</code></h4><p><code>update</code> 脚本和 <code>pre-receive</code> 脚本十分类似，不同之处在于它会为每一个准备更新的分支各运行一次。 假如推送者同时向多个分支推送内容，<code>pre-receive</code> 只运行一次，相比之下 <code>update</code> 则会为每一个被推送的分支各运行一次。 它不会从标准输入读取内容，而是接受三个参数：引用的名字（分支），推送前的引用指向的内容的 SHA-1 值，以及用户准备推送的内容的 SHA-1 值。 如果 update 脚本以非零值退出，只有相应的那一个引用会被拒绝；其余的依然会被更新。</p>
+<h4 id="post-receive"><a href="#post-receive" class="headerlink" title="post-receive"></a><code>post-receive</code></h4><p><code>post-receive</code> 挂钩在整个过程完结以后运行，可以用来更新其他系统服务或者通知用户。 它接受与 <code>pre-receive</code> 相同的标准输入数据。 它的用途包括给某个邮件列表发信，通知持续集成（continous integration）的服务器，或者更新问题追踪系统（ticket-tracking system） —— 甚至可以通过分析提交信息来决定某个问题（ticket）是否应该被开启，修改或者关闭。 该脚本无法终止推送进程，不过客户端在它结束运行之前将保持连接状态，所以如果你想做其他操作需谨慎使用它，因为它将耗费你很长的一段时间。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#客户端钩子"><span class="toc-number">1.</span> <span class="toc-text">客户端钩子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#服务器端钩子"><span class="toc-number">2.</span> <span class="toc-text">服务器端钩子</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pre-receive"><span class="toc-number">2.1.</span> <span class="toc-text">pre-receive</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#update"><span class="toc-number">2.2.</span> <span class="toc-text">update</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#post-receive"><span class="toc-number">2.3.</span> <span class="toc-text">post-receive</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/05/git-hooks/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/05/git-hooks/&text=git钩子"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/05/git-hooks/&is_video=false&description=git钩子"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=git钩子&body=Check out this article: http://nqiu.github.io/2020/01/05/git-hooks/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/05/git-hooks/&title=git钩子"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/05/git-hooks/&name=git钩子&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    <a href="http://beian.miit.gov.cn">京ICP备19057023号-1</a>
+    Copyright &copy; 2020 Nicholas Qiu
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+<!-- clipboard -->
+
+  <script src="/lib/clipboard/clipboard.min.js"></script>
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight .code pre").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      target: function(trigger) {
+        return trigger.nextElementSibling;
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="我大学及工作期间，学习并使用过编程语言（包括标记语言）和框架有ShellScript/BashScript、Python/Django/Flask/Tonano、PHP/Yii、JS/nodejs/React、XML/HTML/CSS/Bootstrap、Java/Groovy/Spring、lua、ruby等，对于快速上手一门语言/框架，并将它运用到工作中，这个门槛还是很低的，各种语言/框架间有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="quick start for a language">
+<meta property="og:url" content="http://nqiu.github.io/2020/01/27/quick-start-for-a-language/index.html">
+<meta property="og:site_name" content="NQiu&#39;s Blog">
+<meta property="og:description" content="我大学及工作期间，学习并使用过编程语言（包括标记语言）和框架有ShellScript/BashScript、Python/Django/Flask/Tonano、PHP/Yii、JS/nodejs/React、XML/HTML/CSS/Bootstrap、Java/Groovy/Spring、lua、ruby等，对于快速上手一门语言/框架，并将它运用到工作中，这个门槛还是很低的，各种语言/框架间有">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-01-27T08:55:54.246Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="quick start for a language">
+<meta name="twitter:description" content="我大学及工作期间，学习并使用过编程语言（包括标记语言）和框架有ShellScript/BashScript、Python/Django/Flask/Tonano、PHP/Yii、JS/nodejs/React、XML/HTML/CSS/Bootstrap、Java/Groovy/Spring、lua、ruby等，对于快速上手一门语言/框架，并将它运用到工作中，这个门槛还是很低的，各种语言/框架间有">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>quick start for a language</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2020/01/08/gitlab-benchmark/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&text=quick start for a language"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&is_video=false&description=quick start for a language"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=quick start for a language&body=Check out this article: http://nqiu.github.io/2020/01/27/quick-start-for-a-language/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&name=quick start for a language&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何快速入门一种语言"><span class="toc-number">1.</span> <span class="toc-text">如何快速入门一种语言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何快速入门语言框架"><span class="toc-number">2.</span> <span class="toc-text">如何快速入门语言框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#写在最后"><span class="toc-number">3.</span> <span class="toc-text">写在最后</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        quick start for a language
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">NQiu's Blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-27T07:41:45.000Z" itemprop="datePublished">2020-01-27</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>我大学及工作期间，学习并使用过编程语言（包括标记语言）和框架有ShellScript/BashScript、Python/Django/Flask/Tonano、PHP/Yii、JS/nodejs/React、XML/HTML/CSS/Bootstrap、Java/Groovy/Spring、lua、ruby等，对于快速上手一门语言/框架，并将它运用到工作中，这个门槛还是很低的，各种语言/框架间有很多共通性。</p>
+<h2 id="如何快速入门一种语言"><a href="#如何快速入门一种语言" class="headerlink" title="如何快速入门一种语言"></a>如何快速入门一种语言</h2><p>语言的分类大致有以下几种，从程序执行角度可分为编译语言（如C/C++，Java，Go）和解释语言（如Python、JS、Perl、Shell）；从语言领域角度，可分为通用程序语言（如C/C++，Java）和专用程序语言（如Groovy、VHDL）；根据语言设计风格，可分为过程式语言、面向对象语言、函数式语言、脚本式语言；按数据类型可分为动态语言、静态语言；按机器是否理解，可分为高级语言、汇编语言、机器语言；还可分为算法描述型语言如C/C++、Java，和数据描述型语言如HTML/XML，JSON等。</p>
+<p>首先，要对一门语言有一个基本的认识，它是一种什么样的语言，有哪些特点，是否跨平台、如何安装，如何运行等，最好是能够编写一个Hello World程序，运行起来。</p>
+<p>然后，就可以从以下几个方面入手来学习（语言的通性），</p>
+<ul>
+<li>基本语法，如内置数据类型、注释、运算符、变量、表达式、类/方法/函数等</li>
+<li>控制结构，如循环、条件分支等</li>
+<li>高级数据结构，如Hash/Map、Set、List、Date、Regex等，熟练使用</li>
+<li>IO，了解IO系统</li>
+<li>标准库/内置库</li>
+<li>第三方库</li>
+</ul>
+<p>再注意学习，该语言特有的语言属性，如lambda函数、闭包等等。</p>
+<h2 id="如何快速入门语言框架"><a href="#如何快速入门语言框架" class="headerlink" title="如何快速入门语言框架"></a>如何快速入门语言框架</h2><p>语言入门后，能够完成一般的编程任务了。实际的业务开发，都是基于某种框架的。框架可以认为是基于某种语言的开发库的集合，它管理各种编程所需资源，如数据库、缓存、进程/协程/线程、后台作业、消息队列、事件循环等等，并对这些资源进行抽象，提供虚拟资源，形成各种组件或服务，并协调各种组件或服务之间的通信，如MVC框架的工作机制。框架目的一般是让开发人员快速上手，专注于业务逻辑开发，框架一般会提供各种配置让开发人员快速配置各种组件与运行环境。</p>
+<p>对于语言框架的学习，首先要理解框架的工作原理/机制，框架提供了哪些特性，哪些是框架已经有的，哪些是需要开发人员去做的，最好是动手运行一个简单的例子。</p>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>对于开发人员，了解这些刚刚处于对语言/框架有个”认识”的阶段，是远远不够的。在开发过程中要不断的阅读官方文档、语言规范，甚至源码，有时间的同学也可以阅读市面上相关的经典书籍。多写代码，实践出真知，在开发过程中遇到的所有问题，都要回归到官方文档或语言规范上来，进一步加深理解。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何快速入门一种语言"><span class="toc-number">1.</span> <span class="toc-text">如何快速入门一种语言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何快速入门语言框架"><span class="toc-number">2.</span> <span class="toc-text">如何快速入门语言框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#写在最后"><span class="toc-number">3.</span> <span class="toc-text">写在最后</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&text=quick start for a language"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&is_video=false&description=quick start for a language"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=quick start for a language&body=Check out this article: http://nqiu.github.io/2020/01/27/quick-start-for-a-language/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&title=quick start for a language"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/27/quick-start-for-a-language/&name=quick start for a language&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    <a href="http://beian.miit.gov.cn">京ICP备19057023号-1</a>
+    Copyright &copy; 2020 Nicholas Qiu
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+<!-- clipboard -->
+
+  <script src="/lib/clipboard/clipboard.min.js"></script>
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight .code pre").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      target: function(trigger) {
+        return trigger.nextElementSibling;
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

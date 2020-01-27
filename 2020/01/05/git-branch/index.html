@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="回顾git对象我们假设现在有一个工作目录，里面包含了三个将要被暂存和提交的文件。 暂存操作会为每一个文件计算校验和（ SHA-1 哈希算法），然后会把当前版本的文件快照保存到 Git 仓库中（Git 使用 blob 对象来保存它们），最终将校验和加入到暂存区域等待提交： 12$ git add README test.rb LICENSE$ git commit -m &apos;The initial c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git分支">
+<meta property="og:url" content="http://nqiu.github.io/2020/01/05/git-branch/index.html">
+<meta property="og:site_name" content="NQiu&#39;s Blog">
+<meta property="og:description" content="回顾git对象我们假设现在有一个工作目录，里面包含了三个将要被暂存和提交的文件。 暂存操作会为每一个文件计算校验和（ SHA-1 哈希算法），然后会把当前版本的文件快照保存到 Git 仓库中（Git 使用 blob 对象来保存它们），最终将校验和加入到暂存区域等待提交： 12$ git add README test.rb LICENSE$ git commit -m &apos;The initial c">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://nqiu.github.io/images/commit-and-tree.png">
+<meta property="og:image" content="http://nqiu.github.io/images/commits-and-parents.png">
+<meta property="og:image" content="http://nqiu.github.io/images/branch-and-history.png">
+<meta property="og:image" content="http://nqiu.github.io/images/two-branches.png">
+<meta property="og:image" content="http://nqiu.github.io/images/head-to-master.png">
+<meta property="og:image" content="http://nqiu.github.io/images/head-to-testing.png">
+<meta property="og:image" content="http://nqiu.github.io/images/advance-testing.png">
+<meta property="og:image" content="http://nqiu.github.io/images/checkout-master.png">
+<meta property="og:image" content="http://nqiu.github.io/images/advance-master.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-branching-4.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-branching-5.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-branching-6.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-merging-1.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-merging-2.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-rebase-1.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-rebase-2.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-rebase-3.png">
+<meta property="og:image" content="http://nqiu.github.io/images/basic-rebase-4.png">
+<meta property="og:updated_time" content="2020-01-27T07:41:04.531Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git分支">
+<meta name="twitter:description" content="回顾git对象我们假设现在有一个工作目录，里面包含了三个将要被暂存和提交的文件。 暂存操作会为每一个文件计算校验和（ SHA-1 哈希算法），然后会把当前版本的文件快照保存到 Git 仓库中（Git 使用 blob 对象来保存它们），最终将校验和加入到暂存区域等待提交： 12$ git add README test.rb LICENSE$ git commit -m &apos;The initial c">
+<meta name="twitter:image" content="http://nqiu.github.io/images/commit-and-tree.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>git分支</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/01/05/git-hooks/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2020/01/05/git-from-the-inside-out/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/05/git-branch/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/05/git-branch/&text=git分支"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/05/git-branch/&is_video=false&description=git分支"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=git分支&body=Check out this article: http://nqiu.github.io/2020/01/05/git-branch/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/05/git-branch/&name=git分支&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#回顾"><span class="toc-number">1.</span> <span class="toc-text">回顾</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#git对象"><span class="toc-number">1.1.</span> <span class="toc-text">git对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支"><span class="toc-number">1.2.</span> <span class="toc-text">分支</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分支管理"><span class="toc-number">2.</span> <span class="toc-text">分支管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建分支"><span class="toc-number">2.1.</span> <span class="toc-text">创建分支</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#切换分支"><span class="toc-number">2.2.</span> <span class="toc-text">切换分支</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支合并"><span class="toc-number">2.3.</span> <span class="toc-text">分支合并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支管理-1"><span class="toc-number">2.4.</span> <span class="toc-text">分支管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#远程分支"><span class="toc-number">2.5.</span> <span class="toc-text">远程分支</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支变基"><span class="toc-number">2.6.</span> <span class="toc-text">分支变基</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        git分支
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">NQiu's Blog</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-05T06:00:49.000Z" itemprop="datePublished">2020-01-05</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="回顾"><a href="#回顾" class="headerlink" title="回顾"></a>回顾</h2><h3 id="git对象"><a href="#git对象" class="headerlink" title="git对象"></a>git对象</h3><p>我们假设现在有一个工作目录，里面包含了三个将要被暂存和提交的文件。 暂存操作会为每一个文件计算校验和（ SHA-1 哈希算法），然后会把当前版本的文件快照保存到 Git 仓库中（Git 使用 blob 对象来保存它们），最终将校验和加入到暂存区域等待提交：</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git add README test.rb LICENSE</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git commit -m <span class="string">'The initial commit of my project'</span></span></span><br></pre></td></tr></table></figure>
+
+<p>当使用 <code>git commit</code> 进行提交操作时，Git 会先计算每一个子目录（本例中只有项目根目录）的校验和，然后在 Git 仓库中这些校验和保存为树对象。 随后，Git 便会创建一个提交对象，它除了包含上面提到的那些信息外，还包含指向这个树对象（项目根目录）的指针。如此一来，Git 就可以在需要的时候重现此次保存的快照。</p>
+<p>现在，Git 仓库中有五个对象：三个 blob 对象（保存着文件快照）、一个树对象（记录着目录结构和 blob 对象索引）以及一个提交对象（包含着指向前述树对象的指针和所有提交信息）。</p>
+<p><img src="/images/commit-and-tree.png" alt="首次提交对象及其树结构"></p>
+<p>做些修改后再次提交，那么这次产生的提交对象会包含一个指向上次提交对象（父对象）的指针。</p>
+<p><img src="/images/commits-and-parents.png" alt="提交对象及其父对象"></p>
+<h3 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h3><p>Git 的分支，其实本质上仅仅是指向提交对象的可变指针。 Git 的默认分支名字是 <code>master</code>。 在多次提交操作之后，你其实已经有一个指向最后那个提交对象的 <code>master</code> 分支。 它会在每次的提交操作中自动向前移动。</p>
+<p><img src="/images/branch-and-history.png" alt></p>
+<h2 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h2><h3 id="创建分支"><a href="#创建分支" class="headerlink" title="创建分支"></a>创建分支</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git branch testing</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/two-branches.png" alt="两个指向相同提交历史的分支"></p>
+<p>现在有两个分支了，那么当前是在哪个分支呢？HEAD是一个特殊的指针，它指向当前所在分支。</p>
+<p><img src="/images/head-to-master.png" alt="HEAD 指向当前所在的分支"></p>
+<h3 id="切换分支"><a href="#切换分支" class="headerlink" title="切换分支"></a>切换分支</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout testing</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/head-to-testing.png" alt="HEAD 指向当前所在的分支"></p>
+<h3 id="分支合并"><a href="#分支合并" class="headerlink" title="分支合并"></a>分支合并</h3><p>在分支上做一些提交</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ vi test.rb</span><br><span class="line">$ git commit -am <span class="string">'made a change'</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/advance-testing.png" alt="HEAD 分支随着提交操作自动向前移动"></p>
+<p> <code>testing</code> 分支向前移动了，但是 <code>master</code> 分支却没有，它仍然指向运行 <code>git checkout</code> 时所指的对象。我们切换回 <code>master</code> 分支</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout master</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/checkout-master.png" alt></p>
+<p>这条命令做了两件事。 一是使 HEAD 指回 <code>master</code> 分支，二是将工作目录恢复成 <code>master</code> 分支所指向的快照内容。 也就是说，你现在做修改的话，项目将始于一个较旧的版本。 本质上来讲，这就是忽略 <code>testing</code> 分支所做的修改，以便于向另一个方向进行开发。</p>
+<p>在master分支，做一些修改</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ vi test.rb</span><br><span class="line">$ git commit -am <span class="string">'made another change'</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/advance-master.png" alt></p>
+<p><strong>FastForward(快进)合并</strong></p>
+<p><img src="/images/basic-branching-4.png" alt></p>
+<p><img src="/images/basic-branching-5.png" alt></p>
+<p><strong>3-way Merge三方合并</strong></p>
+<p><img src="/images/basic-branching-6.png" alt></p>
+<p><img src="/images/basic-merging-1.png" alt></p>
+<p><img src="/images/basic-merging-2.png" alt></p>
+<h3 id="分支管理-1"><a href="#分支管理-1" class="headerlink" title="分支管理"></a>分支管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git branch -v</span><br><span class="line">$ git branch --merged</span><br><span class="line">$ git branch --no-merged</span><br><span class="line">$ git branch -d testing</span><br></pre></td></tr></table></figure>
+
+<h3 id="远程分支"><a href="#远程分支" class="headerlink" title="远程分支"></a>远程分支</h3><p>远程引用是对远程仓库的引用（指针），包括分支、标签等等。 你可以通过 <code>git ls-remote (remote)</code> 来显式地获得远程引用的完整列表，或者通过 <code>git remote show (remote)</code> 获得远程分支的更多信息。 然而，一个更常见的做法是利用远程跟踪分支。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ git ls-remote</span><br><span class="line">From https://github.com/nqiu/Blogs</span><br><span class="line">5fbdce962018df477c5f0cf636abe38291b5412e        HEAD</span><br><span class="line">5fbdce962018df477c5f0cf636abe38291b5412e        refs/heads/master</span><br><span class="line">$ git remote show origin</span><br><span class="line">* remote origin</span><br><span class="line">  Fetch URL: https://github.com/nqiu/Blogs</span><br><span class="line">  Push  URL: https://github.com/nqiu/Blogs</span><br><span class="line">  HEAD branch: master</span><br><span class="line">  Remote branch:</span><br><span class="line">    master tracked</span><br><span class="line">  Local branch configured <span class="keyword">for</span> <span class="string">'git pull'</span>:</span><br><span class="line">    master merges with remote master</span><br><span class="line">  Local ref configured <span class="keyword">for</span> <span class="string">'git push'</span>:</span><br><span class="line">    master pushes to master (fast-forwardable)</span><br></pre></td></tr></table></figure>
+
+<p>远程跟踪分支，以 <code>(remote)/(branch)</code> 形式命名 是远程分支状态的引用。 它们是你不能移动的本地引用，当你做任何网络通信操作时，它们会自动移动。 远程跟踪分支像是你上次连接到远程仓库时，那些分支所处状态的书签。</p>
+<p><strong>拉取</strong></p>
+<p>当 <code>git fetch</code> 命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容。 它只会获取数据然后让你自己合并。 然而，有一个命令叫作 <code>git pull</code> 在大多数情况下它的含义是一个 <code>git fetch</code> 紧接着一个 <code>git merge</code> 命令。 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git fetch</span><br><span class="line">$ git pull</span><br></pre></td></tr></table></figure>
+
+<p><strong>推送</strong></p>
+<p>当你想要公开分享一个分支时，需要将其推送到有写入权限的远程仓库上。 本地的分支并不会自动与远程仓库同步——你必须显式地推送想要分享的分支。 这样，你就可以把不愿意分享的内容放到私人分支上，而将需要和别人协作的内容推送到公开分支。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin master</span><br><span class="line"><span class="comment"># 删除远程分支</span></span><br><span class="line">$ git push origin --delete testing</span><br></pre></td></tr></table></figure>
+
+<h3 id="分支变基"><a href="#分支变基" class="headerlink" title="分支变基"></a>分支变基</h3><p>在 Git 中整合来自不同分支的修改主要有两种方法：<code>merge</code> 以及 <code>rebase</code>。</p>
+<p><img src="/images/basic-rebase-1.png" alt></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout master</span><br><span class="line">$ git merge experiment</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/basic-rebase-2.png" alt></p>
+<p>其实，还有一种方法：你可以提取在 <code>C4</code> 中引入的补丁和修改，然后在 <code>C3</code> 的基础上应用一次。 在 Git 中，这种操作就叫做 <em>变基</em>。 你可以使用 <code>rebase</code> 命令将提交到某一分支上的所有修改都移至另一分支上，就好像“重新播放”一样。</p>
+<p><img src="/images/basic-rebase-3.png" alt></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout experiment</span><br><span class="line">$ git rebase master</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/basic-rebase-4.png" alt></p>
+<p>这两种整合方法的最终结果没有任何区别，但是变基使得提交历史更加整洁。 你在查看一个经过变基的分支的历史记录时会发现，尽管实际的开发工作是并行的，但它们看上去就像是串行的一样，提交历史是一条直线没有分叉。一般我们这样做的目的是为了确保在向远程分支推送时能保持提交历史的整洁。</p>
+<p><strong>变基的风险</strong>: 不要对在你的仓库外有副本的分支执行变基。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#回顾"><span class="toc-number">1.</span> <span class="toc-text">回顾</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#git对象"><span class="toc-number">1.1.</span> <span class="toc-text">git对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支"><span class="toc-number">1.2.</span> <span class="toc-text">分支</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分支管理"><span class="toc-number">2.</span> <span class="toc-text">分支管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建分支"><span class="toc-number">2.1.</span> <span class="toc-text">创建分支</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#切换分支"><span class="toc-number">2.2.</span> <span class="toc-text">切换分支</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支合并"><span class="toc-number">2.3.</span> <span class="toc-text">分支合并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支管理-1"><span class="toc-number">2.4.</span> <span class="toc-text">分支管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#远程分支"><span class="toc-number">2.5.</span> <span class="toc-text">远程分支</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分支变基"><span class="toc-number">2.6.</span> <span class="toc-text">分支变基</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://nqiu.github.io/2020/01/05/git-branch/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://nqiu.github.io/2020/01/05/git-branch/&text=git分支"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://nqiu.github.io/2020/01/05/git-branch/&is_video=false&description=git分支"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=git分支&body=Check out this article: http://nqiu.github.io/2020/01/05/git-branch/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://nqiu.github.io/2020/01/05/git-branch/&title=git分支"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://nqiu.github.io/2020/01/05/git-branch/&name=git分支&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    <a href="http://beian.miit.gov.cn">京ICP备19057023号-1</a>
+    Copyright &copy; 2020 Nicholas Qiu
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+<!-- clipboard -->
+
+  <script src="/lib/clipboard/clipboard.min.js"></script>
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight .code pre").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      target: function(trigger) {
+        return trigger.nextElementSibling;
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
